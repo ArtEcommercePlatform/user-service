@@ -3,12 +3,10 @@ package com.artztall.user_service.model;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
 @Data
-@Document(collection = "users")
-public class BaseUser {
+public abstract class BaseUser {
     @Id
     private String id;
 

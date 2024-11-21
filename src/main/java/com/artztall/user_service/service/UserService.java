@@ -17,8 +17,11 @@ public class UserService {
 
     // Artisan methods
     public Page<ArtisanDTO> getAllArtisans(Pageable pageable) {
-        return artisanRepository.findAll(pageable)
-                .map(this::convertToArtisanDTO);
+        // Fetch all artisans from the repository with pagination
+        Page<Artisan> artisansPage = artisanRepository.findAll(pageable);
+
+        // Convert each Artisan object to ArtisanDTO using the map() method
+        return artisansPage.map(this::convertToArtisanDTO);
     }
 
     public ArtisanDTO getArtisanById(String id) {
@@ -59,7 +62,7 @@ public class UserService {
         if (request.getName() != null) buyer.setName(request.getName());
         if (request.getPhoneNumber() != null) buyer.setPhoneNumber(request.getPhoneNumber());
         if (request.getProfilePictureUrl() != null) buyer.setProfilePictureUrl(request.getProfilePictureUrl());
-        if (request.getAddresses() != null) buyer.setAddresses(request.getAddresses());
+        if (request.getAddresses() != null) buyer.setAddress(request.getAddresses());
 
 
         return convertToBuyerDTO(buyerRepository.save(buyer));
@@ -88,7 +91,7 @@ public class UserService {
         dto.setName(buyer.getName());
         dto.setPhoneNumber(buyer.getPhoneNumber());
         dto.setProfilePictureUrl(buyer.getProfilePictureUrl());
-        dto.setAddresses(buyer.getAddresses());
+        dto.setAddresses(buyer.getAddress());
         dto.setFavoriteArtisans(buyer.getFavoriteArtisans());
         dto.setRecentlyViewedProducts(buyer.getRecentlyViewedProducts());
         return dto;

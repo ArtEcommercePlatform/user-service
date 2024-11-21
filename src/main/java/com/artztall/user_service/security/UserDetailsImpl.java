@@ -1,7 +1,6 @@
 package com.artztall.user_service.security;
 
 import com.artztall.user_service.model.BaseUser;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,10 +8,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-@AllArgsConstructor
-public class UserDetailsImpl implements UserDetails {
 
-    private final BaseUser user;
+
+public record UserDetailsImpl(BaseUser user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

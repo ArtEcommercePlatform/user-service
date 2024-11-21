@@ -9,7 +9,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "buyers")
 public class Buyer extends BaseUser {
-    private Address addresses;
+    private Address address;
     private List<String> favoriteArtisans;
     private List<String> recentlyViewedProducts;
 }

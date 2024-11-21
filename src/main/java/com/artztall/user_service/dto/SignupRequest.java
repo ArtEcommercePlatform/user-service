@@ -30,5 +30,5 @@ public class SignupRequest {
     private String bio;
     private List<String> artworkCategories;
     //buyer
-    private Address addresses;
+    private Address address;
 }
