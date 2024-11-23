@@ -65,6 +65,7 @@ public class AuthService {
             user = artisanRepository.save((Artisan) user);
         } else {
             user = buyerRepository.save((Buyer) user);
+            System.out.println(user);
         }
 
         // Generate JWT token
@@ -126,6 +127,7 @@ public class AuthService {
 
     private void setCommonUserProperties(BaseUser user, SignupRequest request) {
         user.setEmail(request.getEmail());
+        user.setProfilePictureUrl(request.getProfImg());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setName(request.getName());
         user.setPhoneNumber(request.getPhoneNumber());
@@ -151,6 +153,7 @@ public class AuthService {
         response.setEmail(user.getEmail());
         response.setName(user.getName());
         response.setUserType(user.getUserType().name());
+        response.setProfImg(user.getProfilePictureUrl());
 
         // Add type-specific information
         if (user instanceof Artisan artisan) {

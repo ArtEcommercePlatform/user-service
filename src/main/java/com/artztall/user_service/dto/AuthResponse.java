@@ -13,10 +13,13 @@ public class AuthResponse {
     private String name;
     private String userType;
 
+    private String profImg;
+
     // Artisan-specific fields
     private String bio;
     private List<String> artworkCategories;
     private boolean isVerified;
+
 
     // Buyer-specific fields
     private Address address;

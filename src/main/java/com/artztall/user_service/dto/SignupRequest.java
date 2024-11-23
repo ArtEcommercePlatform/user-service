@@ -26,6 +26,8 @@ public class SignupRequest {
 
     private String userType;
 
+    private String profImg;
+
     // Fields specific to Artisan
     private String bio;
     private List<String> artworkCategories;
