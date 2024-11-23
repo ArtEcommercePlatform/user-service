@@ -40,71 +40,96 @@ public class AuthService {
 
     @Transactional
     public AuthResponse signup(SignupRequest request) {
+        validateSignupRequest(request);
+
         // Check if user exists in any repository
-        if (userRepository.existsByEmail(request.getEmail()) ||
-                artisanRepository.existsByEmail(request.getEmail()) ||
-                buyerRepository.existsByEmail(request.getEmail())) {
+        if (isEmailTaken(request.getEmail())) {
             throw new UserAlreadyExistsException("Email is already taken: " + request.getEmail());
         }
 
-        BaseUser user;
-        // Create user based on type
-        if (request.getUserType().equals(UserType.ARTISAN.name())) {
-            user = createArtisan(request);
-        } else if (request.getUserType().equals(UserType.BUYER.name())) {
-            user = createBuyer(request);
-        } else {
-            throw new IllegalArgumentException("Invalid user type: " + request.getUserType());
-        }
-
-        // Set common user properties
+        BaseUser user = createUserByType(request);
         setCommonUserProperties(user, request);
+        user = saveUser(user);
 
-        // Save user based on type
-        if (user instanceof Artisan) {
-            user = artisanRepository.save((Artisan) user);
-        } else {
-            user = buyerRepository.save((Buyer) user);
-            System.out.println(user);
-        }
-
-        // Generate JWT token
         UserDetailsImpl userDetails = new UserDetailsImpl(user);
         String token = tokenProvider.generateToken(userDetails);
 
         return createAuthResponse(user, token);
     }
 
+    private boolean isEmailTaken(String email) {
+        return userRepository.existsByEmail(email) ||
+                artisanRepository.existsByEmail(email) ||
+                buyerRepository.existsByEmail(email);
+    }
+
+    private void validateSignupRequest(SignupRequest request) {
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+        if (request.getUserType() == null) {
+            throw new IllegalArgumentException("User type must be specified");
+        }
+    }
+
+    private BaseUser createUserByType(SignupRequest request) {
+        try {
+            UserType userType = UserType.valueOf(request.getUserType());
+            return switch (userType) {
+                case ARTISAN -> createArtisan(request);
+                case BUYER -> createBuyer(request);
+                default -> throw new IllegalArgumentException("Unsupported user type: " + userType);
+            };
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid user type: " + request.getUserType());
+        }
+    }
+
+    private BaseUser saveUser(BaseUser user) {
+        return switch (user.getUserType()) {
+            case ARTISAN -> artisanRepository.save((Artisan) user);
+            case BUYER -> buyerRepository.save((Buyer) user);
+            case ADMIN -> userRepository.save(user);
+        };
+    }
+
     @Transactional
     public AuthResponse login(LoginRequest request) {
+        validateLoginRequest(request);
+
         try {
-            // Authenticate user
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
             UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-            // Find user in appropriate repository based on type
             BaseUser user = findUserByEmail(request.getEmail())
                     .orElseThrow(() -> new UserNotFoundException("User not found with email: " + request.getEmail()));
 
-            // Update last login date
-            user.setLastLoginDate(LocalDateTime.now());
-            if (user instanceof Artisan) {
-                user = artisanRepository.save((Artisan) user);
-            } else {
-                user = buyerRepository.save((Buyer) user);
-            }
-
-            // Generate new token
+            updateLastLoginDate(user);
             String token = tokenProvider.generateToken(userDetails);
 
             return createAuthResponse(user, token);
-
         } catch (BadCredentialsException e) {
             throw new BadCredentialsException("Invalid email or password");
         }
+    }
+
+    private void validateLoginRequest(LoginRequest request) {
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("Email cannot be empty");
+        }
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password cannot be empty");
+        }
+    }
+
+    private void updateLastLoginDate(BaseUser user) {
+        user.setLastLoginDate(LocalDateTime.now());
+        saveUser(user);
     }
 
     private Artisan createArtisan(SignupRequest request) {
@@ -142,8 +167,7 @@ public class AuthService {
             return Optional.of(artisan.get());
         }
 
-        Optional<Buyer> buyer = buyerRepository.findByEmail(email);
-        return buyer.map(value -> value);
+        return buyerRepository.findByEmail(email).map(buyer -> buyer);
     }
 
     private AuthResponse createAuthResponse(BaseUser user, String token) {
@@ -155,7 +179,6 @@ public class AuthService {
         response.setUserType(user.getUserType().name());
         response.setProfImg(user.getProfilePictureUrl());
 
-        // Add type-specific information
         if (user instanceof Artisan artisan) {
             response.setBio(artisan.getBio());
             response.setArtworkCategories(artisan.getArtworkCategories());
