@@ -12,4 +12,5 @@ public class Buyer extends BaseUser {
     private Address address;
     private List<String> favoriteArtisans;
     private List<String> recentlyViewedProducts;
+    private List<WishListItem> whishList;
 }

@@ -14,7 +14,7 @@ public class OpenApiConfig {
     public OpenAPI productServiceOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Product Service API")
+                        .title("User Service API")
                         .version("1.0")
                         .description("user management & Authentocation Service for Artztall")
                         .contact(new Contact()

@@ -1,6 +1,7 @@
 package com.artztall.user_service.dto;
 
 import com.artztall.user_service.model.Address;
+import com.artztall.user_service.model.WishListItem;
 import lombok.Data;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public class BuyerDTO {
     private String defaultAddressId;
     private List<String> favoriteArtisans;
     private List<String> recentlyViewedProducts;
+    private List<WishListItem> wishlist;
 }

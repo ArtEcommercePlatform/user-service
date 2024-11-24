@@ -123,4 +123,5 @@ public class UserController {
     ) {
         return ResponseEntity.ok(userService.updateBuyer(id, request));
     }
+
 }

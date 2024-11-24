@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -68,6 +73,52 @@ public class UserService {
         return convertToBuyerDTO(buyerRepository.save(buyer));
     }
 
+    public BuyerDTO addItemToWishlist(String buyerId, WishListItem wishListItem) {
+        Buyer buyer = buyerRepository.findById(buyerId)
+                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+
+        // Set the current timestamp if not already set
+        if (wishListItem.getAddedOn() == null) {
+            wishListItem.setAddedOn(LocalDateTime.now());
+        }
+
+        // Initialize wishlist if null
+        if (buyer.getWhishList() == null) {
+            buyer.setWhishList(new ArrayList<>());
+        }
+
+        // Check if product already exists in wishlist
+        boolean productExists = buyer.getWhishList().stream()
+                .anyMatch(item -> item.getProductId().equals(wishListItem.getProductId()));
+
+        if (!productExists) {
+            buyer.getWhishList().add(wishListItem);
+            Buyer savedBuyer = buyerRepository.save(buyer);
+            return convertToBuyerDTO(savedBuyer);
+        }
+
+        return convertToBuyerDTO(buyer);
+    }
+
+    public BuyerDTO removeItemFromWishlist(String buyerId, String productId) {
+        Buyer buyer = buyerRepository.findById(buyerId)
+                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+
+        if (buyer.getWhishList() != null) {
+            buyer.getWhishList().removeIf(item -> item.getProductId().equals(productId));
+            Buyer savedBuyer = buyerRepository.save(buyer);
+            return convertToBuyerDTO(savedBuyer);
+        }
+
+        return convertToBuyerDTO(buyer);
+    }
+
+    public List<WishListItem> getWishlist(String buyerId) {
+        Buyer buyer = buyerRepository.findById(buyerId)
+                .orElseThrow(() -> new RuntimeException("Buyer not found"));
+
+        return buyer.getWhishList() != null ? buyer.getWhishList() : new ArrayList<>();
+    }
     // Helper methods
     private ArtisanDTO convertToArtisanDTO(Artisan artisan) {
         ArtisanDTO dto = new ArtisanDTO();
@@ -94,6 +145,7 @@ public class UserService {
         dto.setAddresses(buyer.getAddress());
         dto.setFavoriteArtisans(buyer.getFavoriteArtisans());
         dto.setRecentlyViewedProducts(buyer.getRecentlyViewedProducts());
+        dto.setWishlist(buyer.getWhishList());
         return dto;
     }
 }

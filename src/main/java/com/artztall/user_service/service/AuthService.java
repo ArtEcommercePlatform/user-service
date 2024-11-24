@@ -147,6 +147,7 @@ public class AuthService {
         buyer.setAddress(request.getAddress());
         buyer.setFavoriteArtisans(new ArrayList<>());
         buyer.setRecentlyViewedProducts(new ArrayList<>());
+        buyer.setWhishList(new ArrayList<>());
         return buyer;
     }
 
