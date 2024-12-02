@@ -1,18 +1,23 @@
 package com.artztall.user_service.service;
 
 
-import com.artztall.user_service.dto.*;
-import com.artztall.user_service.model.*;
-import com.artztall.user_service.repository.*;
+import com.artztall.user_service.dto.ArtisanDTO;
+import com.artztall.user_service.dto.BuyerDTO;
+import com.artztall.user_service.dto.UpdateArtisanRequest;
+import com.artztall.user_service.dto.UpdateBuyerRequest;
+import com.artztall.user_service.model.Artisan;
+import com.artztall.user_service.model.Buyer;
+import com.artztall.user_service.model.WishListItem;
+import com.artztall.user_service.repository.BuyerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import com.artztall.user_service.repository.ArtisanRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
