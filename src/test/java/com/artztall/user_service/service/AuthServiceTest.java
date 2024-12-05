@@ -72,6 +72,7 @@ class AuthServiceTest {
 
         Artisan artisan = new Artisan();
         artisan.setEmail(request.getEmail());
+        artisan.setUserType(UserType.ARTISAN); // Set valid UserType
 
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(false);
         when(artisanRepository.existsByEmail(request.getEmail())).thenReturn(false);
@@ -88,6 +89,7 @@ class AuthServiceTest {
         assertEquals("jwtToken", response.getToken());
         verify(artisanRepository, times(1)).save(any(Artisan.class));
     }
+
 
     @Test
     void testSignup_EmailAlreadyTaken() {
@@ -112,6 +114,7 @@ class AuthServiceTest {
 
         BaseUser user = new Artisan();
         user.setEmail(request.getEmail());
+        user.setUserType(UserType.ARTISAN); // Set valid UserType
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(mock(Authentication.class));
         when(artisanRepository.findByEmail(request.getEmail())).thenReturn(Optional.of((Artisan) user));
@@ -126,6 +129,7 @@ class AuthServiceTest {
         assertEquals("jwtToken", response.getToken());
         verify(artisanRepository, times(1)).findByEmail(request.getEmail());
     }
+
 
     @Test
     void testLogin_UserNotFound() {
