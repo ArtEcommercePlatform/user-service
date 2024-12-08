@@ -86,7 +86,7 @@ class AuthServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals("test@example.com", response.getEmail());
-        assertEquals("jwtToken", response.getToken());
+        assertEquals("eyJhbGciOiJIUzM4NCJ9.eyJyb2xlIjoiUk9MRV9CVVlFUiIsImlkIjoiNjc0MWNlMDllODA2ZjU0NjhmNDZjY2JhIiwic3ViIjoiYXJ0aXNhbkBleGFtcGxlLmNvbSIsImlhdCI6MTczMzIwNDkxMywiZXhwIjoxNzMzMjkxMzEzfQ.yhAPVfg6GsAIj3ITzm-XBCE1JbijVKzm9HUxTOI7-kNTWDs_tkFF2f31hyRzKly5", response.getToken());
         verify(artisanRepository, times(1)).save(any(Artisan.class));
     }
 
