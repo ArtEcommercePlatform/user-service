@@ -97,6 +97,7 @@ class AuthServiceTest {
         SignupRequest request = new SignupRequest();
         request.setEmail("test@example.com");
         request.setPassword("password123");
+        request.setUserType("ARTISAN"); // Ensure this matches the validation logic
 
         when(userRepository.existsByEmail(request.getEmail())).thenReturn(true);
 
@@ -104,6 +105,7 @@ class AuthServiceTest {
         assertThrows(UserAlreadyExistsException.class, () -> authService.signup(request));
         verify(artisanRepository, never()).save(any(Artisan.class));
     }
+
 
     @Test
     void testLogin_Success() {
@@ -116,7 +118,8 @@ class AuthServiceTest {
         user.setEmail(request.getEmail());
         user.setUserType(UserType.ARTISAN); // Set valid UserType
 
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(mock(Authentication.class));
+        Authentication authentication = mock(Authentication.class);
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(artisanRepository.findByEmail(request.getEmail())).thenReturn(Optional.of((Artisan) user));
         when(tokenProvider.generateToken(any(UserDetailsImpl.class))).thenReturn("jwtToken");
 
@@ -128,6 +131,7 @@ class AuthServiceTest {
         assertEquals("test@example.com", response.getEmail());
         assertEquals("jwtToken", response.getToken());
         verify(artisanRepository, times(1)).findByEmail(request.getEmail());
+        verify(tokenProvider, times(1)).generateToken(any(UserDetailsImpl.class));
     }
 
 
@@ -143,7 +147,11 @@ class AuthServiceTest {
 
         // Act & Assert
         assertThrows(UserNotFoundException.class, () -> authService.login(request));
+
+        // Verify no interactions with authenticationManager
+        verify(authenticationManager, never()).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
+
 
     @Test
     void testLogin_InvalidCredentials() {
