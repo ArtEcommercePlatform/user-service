@@ -74,9 +74,9 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-    @Bean
-    public JwtTokenProvider jwtTokenProvider() {
-        return new JwtTokenProvider();
-    }
+//
+//    @Bean
+//    public JwtTokenProvider jwtTokenProvider() {
+//        return new JwtTokenProvider();
+//    }
 }
