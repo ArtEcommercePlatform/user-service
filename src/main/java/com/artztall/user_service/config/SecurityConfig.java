@@ -2,6 +2,7 @@ package com.artztall.user_service.config;
 
 import com.artztall.user_service.security.JwtAuthenticationFilter;
 import com.artztall.user_service.security.JwtAuthenticationEntryPoint;
+import com.artztall.user_service.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -72,5 +73,10 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtTokenProvider jwtTokenProvider() {
+        return new JwtTokenProvider();
     }
 }
