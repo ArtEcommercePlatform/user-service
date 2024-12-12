@@ -114,7 +114,7 @@ public class AuthService {
 
             return createAuthResponse(user, token);
         } catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid email or password");
+            throw new UserNotFoundException("Invalid email or password");
         }
     }
 
